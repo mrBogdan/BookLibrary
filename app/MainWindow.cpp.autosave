@@ -1,0 +1,9 @@
+#include "app/MainWidget.h"
+
+MainWidget::MainWidget(QMainWindow* parent)
+    : QMainWindow(parent)
+{
+    this->showMaximized();
+}
+
+MainWidget::~MainWidget() {}
