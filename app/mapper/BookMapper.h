@@ -15,9 +15,9 @@ class BookMapper
 {
 public:
    QJsonObject getBooksFromString(const QString &json);
-   BookModel  doObject(const QJsonValue& v);
+   BookModel  doObject(const QJsonObject& v);
    QVector<BookModel> doObjects(const QString& json);
-   QJsonArray toJson(const QVector<BookModel>& vec);
+   QJsonObject doJson(const QVector<BookModel>& vec);
 };
 
 #endif // BOOKMAPPER_H

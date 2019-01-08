@@ -5,9 +5,11 @@
 #include <QMetaType>
 #include <QStringList>
 #include <QVector>
+#include <QJsonObject>
 #include <QDebug>
 
-struct BookModel {
+class BookModel {
+public:
     int     id;
     QString name;
     QString author;
@@ -16,10 +18,14 @@ struct BookModel {
     int     pageCount;
     QString link;
 
+
     const static QStringList names;
+    void write(QJsonObject& json);
+    void read(const QJsonObject& json);
+    void print(QVector<BookModel> vec);
 };
 
-void showBooks(QVector<BookModel> vec);
+
 
 
 #endif // BOOKMODEL_H

@@ -8,9 +8,11 @@
 #include <QVector>
 #include <QMenu>
 #include <QMenuBar>
+#include <QJsonDocument>
 #include "app/models/BookModel.h"
 #include "app/utils/FileHelper.h"
 #include "app/mapper/BookMapper.h"
+#include "app/presenter/AddBookWndow.h"
 
 
 class MainWindow : public QMainWindow
@@ -42,11 +44,18 @@ private:
     QPushButton* sortByNameBtn;
     QPushButton* save;
 
+    QString fileName;
+    QString dirName;
+
+
+    AddBookWindow* addWnd;
+
     int rowCount;
     int columnCount;
 
     void createMenus();
     void setValues();
+    void setTableWidget();
 
 private slots:
     void addBookSlot();
@@ -61,6 +70,7 @@ private slots:
 signals:
 
 public slots:
+    void updateEntries();
 
 };
 

@@ -6,10 +6,12 @@ SOURCES += \
     app/utils/FileHelper.cpp \
     app/presenter/MainWindow.cpp \
     app/mapper/BookMapper.cpp \
-    app/models/BookModel.cpp
+    app/models/BookModel.cpp \
+    app/presenter/AddBookWndow.cpp
 
 HEADERS += \
     app/utils/FileHelper.h \
     app/presenter/Mainwindow.h \
     app/models/BookModel.h \
-    app/mapper/BookMapper.h
+    app/mapper/BookMapper.h \
+    app/presenter/AddBookWndow.h

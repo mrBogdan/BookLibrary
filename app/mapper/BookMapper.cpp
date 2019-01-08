@@ -22,44 +22,46 @@ QJsonObject BookMapper::getBooksFromString(const QString &json)
     return json_obj;
 }
 
-BookModel BookMapper::doObject(const QJsonValue& v)
+BookModel BookMapper::doObject(const QJsonObject& v)
 {
-    BookModel bookModel;
+    BookModel book;
 
-    bookModel.id = v.toObject().value("id").toInt();
-    bookModel.name = v.toObject().value("name").toString();
-    bookModel.author = v.toObject().value("author").toString();
-    bookModel.year = v.toObject().value("year").toInt();
-    bookModel.description = v.toObject().value("author").toString();
-    bookModel.pageCount = v.toObject().value("pageCount").toInt();
-    bookModel.link = v.toObject().value("link").toString();
+    book.read(v);
 
-    return bookModel;
+    return book;
+}
+
+QJsonObject BookMapper::doJson(const QVector<BookModel>& vec)
+{
+    QJsonArray booksArray;
+
+    for (BookModel val : vec)
+    {
+        QJsonObject book;
+        val.write(book);
+
+        booksArray.append(book);
+    }
+
+    QJsonObject json;
+    json["books"] = booksArray;
+
+    return json;
 }
 
 QVector<BookModel> BookMapper::doObjects(const QString& json)
 {
     QJsonObject obj = getBooksFromString(json);
 
-    QJsonValue value = obj.value("books");
-
-    QJsonArray array = value.toArray();
+    QJsonArray array = obj["books"].toArray();
 
     QVector<BookModel> books;
 
-    foreach (const QJsonValue& v, array)
+    for (int i = 0; i < array.size(); ++ i)
     {
-        books.push_back(this->doObject(v));
+        books.push_back(this->doObject(array[i].toObject()));
     }
 
     return books;
 }
-
-QJsonArray BookMapper::toJson(const QVector<BookModel>& vec)
-{
-    QJsonArray result;
-    //std::copy (vec.begin(), vec.end(), std::back_inserter(result));
-    return result;
-}
-
 

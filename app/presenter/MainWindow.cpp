@@ -3,11 +3,13 @@
 MainWindow::MainWindow(const QString& path, QWidget *parent) : QMainWindow(parent)
 {
     this->path = path;
+    this->dirName = "entries";
+    this->fileName = "books.json";
     this->showMaximized();
 
     booksVector = getBooks();
     rowCount = booksVector.size();
-    columnCount = 7;
+    columnCount = 6;
 
     wdg = new QWidget;
 
@@ -19,21 +21,16 @@ MainWindow::MainWindow(const QString& path, QWidget *parent) : QMainWindow(paren
     sortByYearBtn = new QPushButton(tr("Sort by year"));
     findBtn       = new QPushButton(tr("Find by name"));
     save          = new QPushButton(tr("Save"));
+    save->setEnabled(false);
 
     actionLayout->addWidget(findBtn);
     actionLayout->addWidget(sortByNameBtn);
     actionLayout->addWidget(sortByYearBtn);
     actionLayout->addWidget(save);
 
-    tableWidget = new QTableWidget(rowCount, columnCount, this);
-    tableWidget->setHorizontalHeaderLabels(BookModel::names);
+    setTableWidget();
 
-    for (auto v : booksVector)
-    {
-        qDebug() << v.name << " ";
-    }
 
-    setValues();
     tableLayout->addWidget(tableWidget);
 
     layout->addLayout(actionLayout);
@@ -41,11 +38,13 @@ MainWindow::MainWindow(const QString& path, QWidget *parent) : QMainWindow(paren
 
     wdg->setLayout(layout);
 
+
     setCentralWidget(wdg);
 
     createMenus();
 
     connect(tableWidget, &QTableWidget::itemChanged, this, &MainWindow::updateSingleValue);
+    connect(save, &QPushButton::clicked, this, &MainWindow::saveSlot);
 }
 
 MainWindow::~MainWindow() {}
@@ -69,11 +68,19 @@ void MainWindow::MainWindow::createMenus()
     connect(about, &QAction::triggered, this, &MainWindow::aboutSlot);
 }
 
+void MainWindow::setTableWidget()
+{
+    tableWidget = new QTableWidget(rowCount, columnCount, this);
+    tableWidget->setUpdatesEnabled(true);
+    tableWidget->setHorizontalHeaderLabels(BookModel::names);
+    setValues();
+}
+
 void MainWindow::addBookSlot()
 {
-    QMessageBox m;
-    m.setText("Add");
-    m.exec();
+   addWnd = new AddBookWindow(booksVector, this);
+   addWnd->show();
+   connect(addWnd, SIGNAL(added()), this, SLOT(updateEntries()));
 }
 
 void MainWindow::removeBookSlot() {}
@@ -82,11 +89,10 @@ void MainWindow::sortBookSlot() {}
 void MainWindow::exportBooksSlot()
 {
     BookMapper mapper;
-    QJsonDocument doc;
-    doc.setArray(mapper.toJson(booksVector));
+    QJsonDocument doc(mapper.doJson(booksVector));
     QString data(doc.toJson());
 
-    FileHelper::upload(path + "/entries", data);
+    FileHelper::upload(path + "/"+ dirName +"/" + fileName, data);
 }
 
 void MainWindow::aboutSlot()
@@ -99,13 +105,12 @@ void MainWindow::aboutSlot()
 QVector<BookModel> MainWindow::getBooks()
 {
     QVector<BookModel> books;
-    QString fullPath = QDir::toNativeSeparators(this->path + "/entries");
+    QString fullPath = QDir::toNativeSeparators(this->path + "/" + dirName);
     QString file = "";
     FileHelper fileHelper(fullPath);
-    QString fullFilePath = QDir::toNativeSeparators(fullPath + "/books.json");
+    QString fullFilePath = QDir::toNativeSeparators(fullPath + "/" + fileName);
 
     BookMapper mapper;
-
 
     if (!QFile::exists(fullPath))
     {
@@ -118,6 +123,9 @@ QVector<BookModel> MainWindow::getBooks()
             stream << "{\"books\": [{}]}" << endl;
             booksFile.close();
         }
+        else {
+            qDebug() << "HERE";
+        }
     }
 
     file = fileHelper.download(fullFilePath);
@@ -128,37 +136,33 @@ QVector<BookModel> MainWindow::getBooks()
 
 void MainWindow::setValues()
 {
+    qDebug() << ">>>>>>>>>" << booksVector[rowCount - 1].name;
+
     for (int i = 0; i < rowCount; ++ i)
     {
+        QTableWidgetItem *name = new QTableWidgetItem;
+        name->setText(booksVector[i].name);
+        tableWidget->setItem(i, 0, name);
 
-            QTableWidgetItem *id = new QTableWidgetItem;
-            id->setText(QString::number(booksVector[i].id));
-            tableWidget->setItem(i, 0, id);
+        QTableWidgetItem *author = new QTableWidgetItem;
+        author->setText(booksVector[i].author);
+        tableWidget->setItem(i, 1, author);
 
+        QTableWidgetItem *year = new QTableWidgetItem;
+        year->setText(QString::number(booksVector[i].year));
+        tableWidget->setItem(i, 2, year);
 
-            QTableWidgetItem *name = new QTableWidgetItem;
-            name->setText(booksVector[i].name);
-            tableWidget->setItem(i, 1, name);
+        QTableWidgetItem *description = new QTableWidgetItem;
+        description->setText(booksVector[i].description);
+        tableWidget->setItem(i, 3, description);
 
-            QTableWidgetItem *author = new QTableWidgetItem;
-            author->setText(booksVector[i].author);
-            tableWidget->setItem(i, 2, author);
+        QTableWidgetItem *pageCount = new QTableWidgetItem;
+        pageCount->setText(QString::number(booksVector[i].pageCount));
+        tableWidget->setItem(i, 4, pageCount);
 
-            QTableWidgetItem *year = new QTableWidgetItem;
-            year->setText(QString::number(booksVector[i].year));
-            tableWidget->setItem(i, 3, year);
-
-            QTableWidgetItem *description = new QTableWidgetItem;
-            description->setText(booksVector[i].description);
-            tableWidget->setItem(i, 4, description);
-
-            QTableWidgetItem *pageCount = new QTableWidgetItem;
-            pageCount->setText(QString::number(booksVector[i].pageCount));
-            tableWidget->setItem(i, 5, pageCount);
-
-            QTableWidgetItem *link = new QTableWidgetItem;
-            link->setText(booksVector[i].link);
-            tableWidget->setItem(i, 6, link);
+        QTableWidgetItem *link = new QTableWidgetItem;
+        link->setText(booksVector[i].link);
+        tableWidget->setItem(i, 5, link);
     }
 }
 
@@ -169,46 +173,55 @@ void MainWindow::updateSingleValue(QTableWidgetItem* item)
 
     switch (col) {
         case 0: {
-            booksVector[row].id = item->text().toInt();
-            break;
-        }
-
-        case 1: {
             booksVector[row].name = item->text();
             break;
         }
 
-        case 2: {
+        case 1: {
             booksVector[row].author = item->text();
             break;
         }
 
-        case 3: {
+        case 2: {
             booksVector[row].year = item->text().toInt();
             break;
         }
 
-        case 4: {
+        case 3: {
             booksVector[row].description = item->text();
             break;
         }
 
-        case 5: {
+        case 4: {
             booksVector[row].pageCount = item->text().toInt();
             break;
         }
 
-        case 6: {
+        case 5: {
             booksVector[row].link = item->text();
             break;
         }
     }
 
-    showBooks(booksVector);
+    save->setEnabled(true);
 }
 
  void MainWindow::saveSlot()
 {
-     FileHelper::upload("");
+     save->setEnabled(false);
+     BookMapper mapper;
+     QJsonDocument doc(mapper.doJson(booksVector));
+     QString filePath = path + "/" + dirName + "/" + fileName;
+
+     FileHelper::upload(filePath, QString(doc.toJson()));
+}
+
+void MainWindow::updateEntries()
+{
+    rowCount = booksVector.size();
+    tableWidget->clearContents();
+    tableWidget->insertRow(rowCount - 1);
+    setValues();
+    saveSlot();
 }
 

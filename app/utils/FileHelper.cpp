@@ -29,7 +29,11 @@ QString FileHelper::download(const QString& filePath)
     if(!QFile::exists(file_path))
     {
         qDebug() << "File does not exists";
-        exit(1);
+        if (file.open(QIODevice::WriteOnly)) {
+            QTextStream stream(&file);
+            stream << "{\"books\": [{}]}" << endl;
+            file.close();
+        }
     }
 
     if(!file.open(QIODevice::ReadOnly))
