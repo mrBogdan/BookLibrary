@@ -29,16 +29,31 @@ QString FileHelper::download(const QString& filePath)
     if(!QFile::exists(file_path))
     {
         qDebug() << "File does not exists";
-        exit(404);
+        exit(1);
     }
 
     if(!file.open(QIODevice::ReadOnly))
     {
         qDebug() << "Failed to open " << file_path;
-        exit(404);
+        exit(1);
     }
 
-    QString json_string;
+    QString json_string = "";
+
     json_string = file.readAll();
     file.close();
+
+    return json_string;
+}
+
+void FileHelper::upload(const QString& path, const QString& data)
+{
+    QFile file(path);
+
+    if (file.open(QIODevice::WriteOnly))
+    {
+        QTextStream stream(&file);
+        stream << data << endl;
+        file.close();
+    }
 }

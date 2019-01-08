@@ -1,15 +1,10 @@
 #include <QApplication>
-#include "app/MainWindowController.h"
-#include "app/utils/FileHelper.h"
+#include "app/presenter/Mainwindow.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    MainWindow wdg;
-
-
-    FileHelper fileHelper(app.applicationDirPath() + "/entries");
-    QFileInfoList list = fileHelper.getListDirs();
+    MainWindow wdg(app.applicationDirPath());
 
     wdg.show();
 

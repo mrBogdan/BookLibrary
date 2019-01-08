@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QFile>
 #include <QDebug>
+#include <QTextStream>
 
 class FileHelper
 {
@@ -16,7 +17,7 @@ public:
     QFileInfoList getListDirs();
     QString getDir() const;
     QString download(const QString& filePath);
-
+    void static upload(const QString& path, const QString& file);
 };
 
 #endif
