@@ -58,6 +58,8 @@ QVector<BookModel> BookMapper::doObjects(const QString& json)
 QJsonArray BookMapper::toJson(const QVector<BookModel>& vec)
 {
     QJsonArray result;
-    std::copy (vec.begin(), vec.end(), std::back_inserter(result));
+    //std::copy (vec.begin(), vec.end(), std::back_inserter(result));
     return result;
 }
+
+

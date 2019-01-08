@@ -18,10 +18,12 @@ MainWindow::MainWindow(const QString& path, QWidget *parent) : QMainWindow(paren
     sortByNameBtn = new QPushButton(tr("Sort by name"));
     sortByYearBtn = new QPushButton(tr("Sort by year"));
     findBtn       = new QPushButton(tr("Find by name"));
+    save          = new QPushButton(tr("Save"));
 
     actionLayout->addWidget(findBtn);
     actionLayout->addWidget(sortByNameBtn);
     actionLayout->addWidget(sortByYearBtn);
+    actionLayout->addWidget(save);
 
     tableWidget = new QTableWidget(rowCount, columnCount, this);
     tableWidget->setHorizontalHeaderLabels(BookModel::names);
@@ -42,6 +44,8 @@ MainWindow::MainWindow(const QString& path, QWidget *parent) : QMainWindow(paren
     setCentralWidget(wdg);
 
     createMenus();
+
+    connect(tableWidget, &QTableWidget::itemChanged, this, &MainWindow::updateSingleValue);
 }
 
 MainWindow::~MainWindow() {}
@@ -156,5 +160,55 @@ void MainWindow::setValues()
             link->setText(booksVector[i].link);
             tableWidget->setItem(i, 6, link);
     }
+}
+
+void MainWindow::updateSingleValue(QTableWidgetItem* item)
+{
+    const int row = item->row();
+    const int col = item->column();
+
+    switch (col) {
+        case 0: {
+            booksVector[row].id = item->text().toInt();
+            break;
+        }
+
+        case 1: {
+            booksVector[row].name = item->text();
+            break;
+        }
+
+        case 2: {
+            booksVector[row].author = item->text();
+            break;
+        }
+
+        case 3: {
+            booksVector[row].year = item->text().toInt();
+            break;
+        }
+
+        case 4: {
+            booksVector[row].description = item->text();
+            break;
+        }
+
+        case 5: {
+            booksVector[row].pageCount = item->text().toInt();
+            break;
+        }
+
+        case 6: {
+            booksVector[row].link = item->text();
+            break;
+        }
+    }
+
+    showBooks(booksVector);
+}
+
+ void MainWindow::saveSlot()
+{
+     FileHelper::upload("");
 }
 

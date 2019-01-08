@@ -40,6 +40,7 @@ private:
     QPushButton* findBtn;
     QPushButton* sortByYearBtn;
     QPushButton* sortByNameBtn;
+    QPushButton* save;
 
     int rowCount;
     int columnCount;
@@ -54,6 +55,8 @@ private slots:
     void findBookSlot();
     void sortBookSlot();
     void aboutSlot();
+    void updateSingleValue(QTableWidgetItem* item);
+    void saveSlot();
 
 signals:
 

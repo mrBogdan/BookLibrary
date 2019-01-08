@@ -4,6 +4,8 @@
 #include <QString>
 #include <QMetaType>
 #include <QStringList>
+#include <QVector>
+#include <QDebug>
 
 struct BookModel {
     int     id;
@@ -17,6 +19,7 @@ struct BookModel {
     const static QStringList names;
 };
 
-Q_DECLARE_METATYPE(BookModel);
+void showBooks(QVector<BookModel> vec);
+
 
 #endif // BOOKMODEL_H
