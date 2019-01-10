@@ -16,7 +16,7 @@ private:
     QPushButton* find;
 
     QLineEdit* nameLe;
-    QLabel* labelName;
+    QLabel*    labelName;
 public:
     explicit FindWindow(QWidget *parent = nullptr);
 

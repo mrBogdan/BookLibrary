@@ -19,7 +19,7 @@
 #include "app/models/BookModel.h"
 #include "app/utils/FileHelper.h"
 #include "app/mapper/BookMapper.h"
-#include "app/presenter/AddBookWndow.h"
+#include "app/presenter/AddBookWindow.h"
 #include "app/presenter/FindWindow.h"
 
 class MainWindow : public QMainWindow
@@ -60,7 +60,7 @@ private:
     void setValues();
     void setTableWidget();
     void updateBookValue(const int row, const int col, QTableWidgetItem* item);
-    int findTableRow(const QString& name);
+    int  findTableRow(const QString& name);
 
 private slots:
     void saveSlot();

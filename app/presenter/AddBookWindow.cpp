@@ -1,20 +1,20 @@
-#include "AddBookWndow.h"
+#include "AddBookWindow.h"
 
 AddBookWindow::AddBookWindow(QVector<BookModel>& vec, QWidget *parent)
     : QMainWindow(parent),
       ref(vec)
 {
     vLayout = new QVBoxLayout(this);
-    layout = new QFormLayout;
+    layout  = new QFormLayout;
 
     add = new QPushButton("Add");
 
-    name = new QLineEdit;
-    author = new QLineEdit;
-    year = new QLineEdit;
+    name        = new QLineEdit;
+    author      = new QLineEdit;
+    year        = new QLineEdit;
     description = new QLineEdit;
-    pageCount = new QLineEdit;
-    link = new QLineEdit;
+    pageCount   = new QLineEdit;
+    link        = new QLineEdit;
 
     layout->addRow(new QLabel(tr("Name: ")), name);
     layout->addRow(new QLabel(tr("Author: ")), author);
@@ -36,19 +36,18 @@ void AddBookWindow::addSlot()
 {
     BookModel mdl;
 
-    mdl.id = (ref.size() - 1);
-    mdl.name = name->text();
-    mdl.author = author->text();
-    mdl.year = year->text().toInt();
+    mdl.id          = (ref.size() - 1);
+    mdl.name        = name->text();
+    mdl.author      = author->text();
+    mdl.year        = year->text().toInt();
     mdl.description = description->text();
-    mdl.pageCount = pageCount->text().toInt();
-    mdl.link = link->text();
+    mdl.pageCount   = pageCount->text().toInt();
+    mdl.link        = link->text();
 
     ref.push_back(mdl);
 
     clearLineEdits();
     emit added();
-
 }
 
 void AddBookWindow::clearLineEdits()

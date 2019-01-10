@@ -2,24 +2,23 @@
 
 QJsonObject BookMapper::getBooksFromString(const QString &json)
 {
-    QByteArray json_bytes = json.toLocal8Bit();
-    QJsonDocument json_doc = QJsonDocument::fromJson(json_bytes);
+    QByteArray jsonBytes  = json.toLocal8Bit();
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonBytes);
 
-    if(json_doc.isNull())
+    if(jsonDoc.isNull())
     {
-        qDebug() << json_bytes;
         qDebug() << "Failed to create JSON doc.";
         exit(1);
     }
-    if(!json_doc.isObject())
+    if(!jsonDoc.isObject())
     {
         qDebug() << "JSON is not an object.";
         exit(1);
     }
 
-    QJsonObject json_obj = json_doc.object();
+    QJsonObject jsonObj = jsonDoc.object();
 
-    return json_obj;
+    return jsonObj;
 }
 
 BookModel BookMapper::doObject(const QJsonObject& v)
@@ -51,7 +50,7 @@ QJsonObject BookMapper::doJson(const QVector<BookModel>& vec)
 
 QVector<BookModel> BookMapper::doObjects(const QString& json)
 {
-    QJsonObject obj = getBooksFromString(json);
+    QJsonObject obj  = getBooksFromString(json);
 
     QJsonArray array = obj["books"].toArray();
 

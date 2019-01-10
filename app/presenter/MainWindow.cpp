@@ -44,29 +44,27 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(findBtn, &QPushButton::clicked, this, &MainWindow::findBookSlot);
 }
 
-MainWindow::~MainWindow() {}
-
 void MainWindow::MainWindow::createMenus()
 {
-    addBook = menuBar()->addMenu(tr("&File"));
+    addBook           = menuBar()->addMenu(tr("&File"));
     QAction* openFile = addBook->addAction(tr("&Open file"));
-    QAction* add = addBook->addAction(tr("&Add new book"));
+    QAction* add      = addBook->addAction(tr("&Add new book"));
     addBook->addSeparator();
-    QAction* exitA = addBook->addAction(tr("&Exit"));
+    QAction* exitA    = addBook->addAction(tr("&Exit"));
 
     connect(openFile, &QAction::triggered, this, &MainWindow::openSlot);
     connect(exitA, &QAction::triggered, this, &MainWindow::exitSlot);
     connect(add, &QAction::triggered, this, &MainWindow::addBookSlot);
 
-    removeBook = menuBar()->addMenu(tr("&Edit"));
+    removeBook      = menuBar()->addMenu(tr("&Edit"));
     QAction* remove = removeBook->addAction(tr("Remove book"));
     connect(remove, &QAction::triggered, this, &MainWindow::removeBookSlot);
 
-    exportBook = menuBar()->addMenu(tr("&Export book"));
+    exportBook                = menuBar()->addMenu(tr("&Export book"));
     QAction* exportBookAction = exportBook->addAction(tr("&Export"));
     connect(exportBookAction, &QAction::triggered, this, &MainWindow::exportBooksSlot);
 
-    help = menuBar()->addMenu(tr("&Help"));
+    help           = menuBar()->addMenu(tr("&Help"));
     QAction* about = help->addAction(tr("&About"));
     connect(about, &QAction::triggered, this, &MainWindow::aboutSlot);
 }
@@ -89,9 +87,8 @@ void MainWindow::addBookSlot()
 
 void MainWindow::removeBookSlot()
 {
-    bool ok = false;
+    bool ok      = false;
     QString name = QInputDialog::getText(this, tr("Remove by name"),
-                                         tr("Enter user name"), QLineEdit::Normal,
                                          QDir::home().dirName(), &ok);
     if (ok)
     {
@@ -109,13 +106,12 @@ void MainWindow::removeBookSlot()
             statusBar()->showMessage("Not found");
         }
     }
-
 }
 
 int MainWindow::findTableRow(const QString& name)
 {
-    int row = -1;
-    int rows = tableWidget->rowCount();
+    int row   = -1;
+    int rows  = tableWidget->rowCount();
     for(int i = 0; i < rows; ++i)
     {
         if(tableWidget->item(i, 0)->text() == name)
@@ -213,7 +209,7 @@ QVector<BookModel> MainWindow::getBooks(const QString& filePath)
 {
     QVector<BookModel> books;
     QString fullPath = QDir::toNativeSeparators(filePath);
-    QString file = "";
+    QString file     = "";
 
     BookMapper mapper;
 
@@ -322,7 +318,6 @@ void MainWindow::updateBookValue(const int row, const int col, QTableWidgetItem*
      else {
          statusBar()->showMessage("Not saved!");
      }
-
 }
 
 void MainWindow::updateEntries()

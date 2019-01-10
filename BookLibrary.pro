@@ -7,13 +7,13 @@ SOURCES += \
     app/presenter/MainWindow.cpp \
     app/mapper/BookMapper.cpp \
     app/models/BookModel.cpp \
-    app/presenter/AddBookWndow.cpp \
-    app/presenter/FindWindow.cpp
+    app/presenter/FindWindow.cpp \
+    app/presenter/AddBookWindow.cpp
 
 HEADERS += \
     app/utils/FileHelper.h \
     app/presenter/Mainwindow.h \
     app/models/BookModel.h \
     app/mapper/BookMapper.h \
-    app/presenter/AddBookWndow.h \
-    app/presenter/FindWindow.h
+    app/presenter/FindWindow.h \
+    app/presenter/AddBookWindow.h
