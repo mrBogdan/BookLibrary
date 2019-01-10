@@ -2,7 +2,7 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-    this->fileName = QFileDialog::getOpenFileName(this, "Open file", NULL, tr("Json (*.json)"));
+    this->fileName = QFileDialog::getOpenFileName(this, "Open file", QDir::home().dirName(), tr("Json (*.json)"));
     this->showMaximized();
 
     booksVector = getBooks(fileName);
@@ -13,15 +13,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     actionLayout = new QVBoxLayout;
     tableLayout  = new QVBoxLayout;
 
-    sortByNameBtn = new QPushButton(tr("Sort by name"));
-    sortByYearBtn = new QPushButton(tr("Sort by year"));
     findBtn       = new QPushButton(tr("Find by name"));
     save          = new QPushButton(tr("Save"));
     save->setEnabled(false);
 
     actionLayout->addWidget(findBtn);
-    actionLayout->addWidget(sortByNameBtn);
-    actionLayout->addWidget(sortByYearBtn);
     actionLayout->addWidget(save);
     actionLayout->setAlignment(Qt::AlignTop);
 
@@ -39,8 +35,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     connect(tableWidget, &QTableWidget::itemChanged, this, &MainWindow::updateSingleValue);
     connect(save, &QPushButton::clicked, this, &MainWindow::saveSlot);
-    connect(sortByNameBtn, &QPushButton::clicked, this, &MainWindow::sortBookByNameSlot);
-    connect(sortByYearBtn, &QPushButton::clicked, this, &MainWindow::sortBookByYearSlot);
     connect(findBtn, &QPushButton::clicked, this, &MainWindow::findBookSlot);
 }
 
@@ -88,8 +82,13 @@ void MainWindow::addBookSlot()
 void MainWindow::removeBookSlot()
 {
     bool ok      = false;
-    QString name = QInputDialog::getText(this, tr("Remove by name"),
-                                         QDir::home().dirName(), &ok);
+    QString name = QInputDialog::getText(this,
+                                         tr("Remove by name"),
+                                         tr("Name: "),
+                                         QLineEdit::Normal,
+                                         QDir::home().dirName(),
+                                         &ok
+                   );
     if (ok)
     {
         int row = findTableRow(name);
@@ -155,28 +154,6 @@ void MainWindow::exitSlot()
     QApplication::exit();
 }
 
-void MainWindow::sortBookByYearSlot()
-{
-    std::sort(booksVector.begin(), booksVector.end(), [](BookModel a, BookModel b) {
-       return a.year > b.year;
-    });
-
-    tableWidget->clearContents();
-    setValues();
-    statusBar()->showMessage("Sorted by year");
-}
-
-void MainWindow::sortBookByNameSlot()
-{
-    std::sort(booksVector.begin(), booksVector.end(), [](BookModel a, BookModel b) {
-        return a.name > b.name;
-    });
-
-    tableWidget->clearContents();
-    setValues();
-    statusBar()->showMessage("Sorted by name");
-}
-
 void MainWindow::exportBooksSlot()
 {
     BookMapper mapper;
@@ -213,18 +190,7 @@ QVector<BookModel> MainWindow::getBooks(const QString& filePath)
 
     BookMapper mapper;
 
-    if (!QFile::exists(filePath))
-    {
-        QFile booksFile(filePath);
-        if (booksFile.open(QIODevice::WriteOnly))
-        {
-            QTextStream stream(&booksFile);
-            stream << "{\"books\": [{}]}" << endl;
-            booksFile.close();
-        }
-    }
-
-    file = FileHelper::download(filePath);
+    file  = FileHelper::download(filePath);
     books = mapper.doObjects(file);
 
     return books;
@@ -331,7 +297,7 @@ void MainWindow::updateEntries()
 
 void MainWindow::openSlot()
 {
-    this->fileName = QFileDialog::getOpenFileName(nullptr, tr("Open file"), "/", tr("Json (*.json)"));
+    this->fileName = QFileDialog::getOpenFileName(nullptr, tr("Open file"), "File path", tr("Json (*.json)"));
 
     tableWidget->clearContents();
     tableWidget->setRowCount(0);

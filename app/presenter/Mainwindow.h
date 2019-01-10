@@ -1,12 +1,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QtWidgets>
 #include <QFile>
 #include <QMenu>
 #include <QVector>
-#include <algorithm>
 #include <QMenuBar>
-#include <QtWidgets>
+#include <QLineEdit>
+#include <algorithm>
 #include <QBoxLayout>
 #include <QStatusBar>
 #include <QMainWindow>
@@ -44,8 +45,6 @@ private:
     QVector<BookModel> booksVector;
 
     QPushButton* findBtn;
-    QPushButton* sortByYearBtn;
-    QPushButton* sortByNameBtn;
     QPushButton* save;
 
     QString fileName;
@@ -73,8 +72,6 @@ private slots:
     void removeBookSlot();
     void exportBooksSlot();
     void updateSingleValue(QTableWidgetItem* item);
-    void sortBookByYearSlot();
-    void sortBookByNameSlot();
 
 signals:
 
