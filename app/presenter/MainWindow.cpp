@@ -165,13 +165,12 @@ void MainWindow::exportBooksSlot()
     saveSlot();
 
     QString savingPlace = QFileDialog::getSaveFileName(this,tr("Export file"), "", tr("Json (*.json)"));
-    QFile file(savingPlace);
 
-    if (file.open(QIODevice::WriteOnly))
+    if (FileHelper::upload(savingPlace, data))
     {
-        QTextStream stream(&file);
-        stream << data;
-        file.close();
+        statusBar()->showMessage("Exported");
+    } else {
+        statusBar()->showMessage("Error, try again!");
     }
 }
 
