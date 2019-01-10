@@ -1,13 +1,11 @@
 #include "Mainwindow.h"
 
-MainWindow::MainWindow(const QString& path, QWidget *parent) : QMainWindow(parent)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-    this->path = path;
-    this->dirName = "entries";
-    this->fileName = "books.json";
+    this->fileName = QFileDialog::getOpenFileName(this, "Open file", "", tr("Json (*.json)"));
     this->showMaximized();
 
-    booksVector = getBooks();
+    booksVector = getBooks(fileName);
     rowCount = booksVector.size();
     columnCount = 6;
 
@@ -30,7 +28,6 @@ MainWindow::MainWindow(const QString& path, QWidget *parent) : QMainWindow(paren
 
     setTableWidget();
 
-
     tableLayout->addWidget(tableWidget);
 
     layout->addLayout(actionLayout);
@@ -40,11 +37,14 @@ MainWindow::MainWindow(const QString& path, QWidget *parent) : QMainWindow(paren
 
 
     setCentralWidget(wdg);
-
+    setStatusBar(new QStatusBar);
     createMenus();
 
     connect(tableWidget, &QTableWidget::itemChanged, this, &MainWindow::updateSingleValue);
     connect(save, &QPushButton::clicked, this, &MainWindow::saveSlot);
+    connect(sortByNameBtn, &QPushButton::clicked, this, &MainWindow::sortBookByNameSlot);
+    connect(sortByYearBtn, &QPushButton::clicked, this, &MainWindow::sortBookByYearSlot);
+    connect(findBtn, &QPushButton::clicked, this, &MainWindow::findBookSlot);
 }
 
 MainWindow::~MainWindow() {}
@@ -52,7 +52,13 @@ MainWindow::~MainWindow() {}
 void MainWindow::MainWindow::createMenus()
 {
     addBook = menuBar()->addMenu(tr("&File"));
-    QAction* add = addBook->addAction("Add new book");
+    QAction* openFile = addBook->addAction(tr("&Open file"));
+    QAction* add = addBook->addAction(tr("&Add new book"));
+    addBook->addSeparator();
+    QAction* exitA = addBook->addAction(tr("&Exit"));
+
+    connect(openFile, &QAction::triggered, this, &MainWindow::openSlot);
+    connect(exitA, &QAction::triggered, this, &MainWindow::exitSlot);
     connect(add, &QAction::triggered, this, &MainWindow::addBookSlot);
 
     removeBook = menuBar()->addMenu(tr("&Edit"));
@@ -72,6 +78,7 @@ void MainWindow::setTableWidget()
 {
     tableWidget = new QTableWidget(rowCount, columnCount, this);
     tableWidget->setUpdatesEnabled(true);
+    tableWidget->horizontalHeader()->sortIndicatorOrder();
     tableWidget->setHorizontalHeaderLabels(BookModel::names);
     setValues();
 }
@@ -83,52 +90,142 @@ void MainWindow::addBookSlot()
    connect(addWnd, SIGNAL(added()), this, SLOT(updateEntries()));
 }
 
-void MainWindow::removeBookSlot() {}
-void MainWindow::findBookSlot() {}
-void MainWindow::sortBookSlot() {}
+void MainWindow::removeBookSlot()
+{
+    bool ok = false;
+    QString name = QInputDialog::getText(this, tr("Remove by name"),
+                                         tr("Enter user name"), QLineEdit::Normal,
+                                         QDir::home().dirName(), &ok);
+    if (ok)
+    {
+        bool found = false;
+        int row = 0;
+        int rows = tableWidget->rowCount();
+        for(int i = 0; i < rows; ++i)
+        {
+            if(tableWidget->item(i, 0)->text() == name)
+            {
+                row = i;
+                found = true;
+                break;
+            }
+        }
+
+        if (found)
+        {
+            save->setEnabled(true);
+            tableWidget->removeRow(row);
+            booksVector.remove(row);
+            statusBar()->showMessage("Removed");
+        }
+        else
+        {
+            statusBar()->showMessage("Not found");
+        }
+    }
+
+}
+
+void MainWindow::findBookSlot()
+{
+   findWnd = new FindWindow(this);
+   connect(findWnd, &FindWindow::findSignal, this, &MainWindow::findBookEntry);
+   findWnd->show();
+}
+
+void MainWindow::findBookEntry(const QString name)
+{
+    QList<QTableWidgetItem*> items = tableWidget->findItems(name, Qt::MatchExactly);
+
+    for (const auto& item : items)
+    {
+        QModelIndex i = tableWidget->model()->index(item->row(), item->column(), QModelIndex());
+
+        tableWidget->selectionModel()->select(i, QItemSelectionModel::Select);
+    }
+
+    if (items.size() == 0)
+    {
+        statusBar()->showMessage("Not found!");
+    } else {
+        statusBar()->showMessage("Done");
+    }
+}
+
+void MainWindow::exitSlot()
+{
+    QApplication::exit();
+}
+
+void MainWindow::sortBookByYearSlot()
+{
+    std::sort(booksVector.begin(), booksVector.end(), [](BookModel a, BookModel b) {
+       return a.year > b.year;
+    });
+
+    tableWidget->clearContents();
+    setValues();
+    statusBar()->showMessage("Sorted by year");
+}
+
+void MainWindow::sortBookByNameSlot()
+{
+    std::sort(booksVector.begin(), booksVector.end(), [](BookModel a, BookModel b) {
+        return a.name > b.name;
+    });
+
+    tableWidget->clearContents();
+    setValues();
+    statusBar()->showMessage("Sorted by name");
+}
+
 void MainWindow::exportBooksSlot()
 {
     BookMapper mapper;
+
     QJsonDocument doc(mapper.doJson(booksVector));
+
     QString data(doc.toJson());
 
-    FileHelper::upload(path + "/"+ dirName +"/" + fileName, data);
+    saveSlot();
+    QString savingPlace = QFileDialog::getSaveFileName(this,tr("Export file"), "", tr("Json (*.json)"));
+    QFile file(savingPlace);
+
+    if (file.open(QIODevice::WriteOnly))
+    {
+        QTextStream stream(&file);
+        stream << data;
+        file.close();
+    }
 }
 
 void MainWindow::aboutSlot()
 {
     QMessageBox about;
-    about.setText("Created by Bogdan Babitskiy");
+    about.setText("Created by Bogdan Babitskiy 2018/2019\nGNU LGPL");
     about.exec();
 }
 
-QVector<BookModel> MainWindow::getBooks()
+QVector<BookModel> MainWindow::getBooks(const QString& filePath)
 {
     QVector<BookModel> books;
-    QString fullPath = QDir::toNativeSeparators(this->path + "/" + dirName);
+    QString fullPath = QDir::toNativeSeparators(filePath);
     QString file = "";
-    FileHelper fileHelper(fullPath);
-    QString fullFilePath = QDir::toNativeSeparators(fullPath + "/" + fileName);
 
     BookMapper mapper;
 
-    if (!QFile::exists(fullPath))
+    if (!QFile::exists(filePath))
     {
-        qDebug() << "Not exists: >>>>>>>>>>>> " << fullPath;
-        QDir().mkdir(fullPath);
-        QFile booksFile(fullFilePath);
+        QFile booksFile(filePath);
         if (booksFile.open(QIODevice::WriteOnly))
         {
             QTextStream stream(&booksFile);
             stream << "{\"books\": [{}]}" << endl;
             booksFile.close();
         }
-        else {
-            qDebug() << "HERE";
-        }
     }
 
-    file = fileHelper.download(fullFilePath);
+    file = FileHelper::download(filePath);
     books = mapper.doObjects(file);
 
     return books;
@@ -136,8 +233,7 @@ QVector<BookModel> MainWindow::getBooks()
 
 void MainWindow::setValues()
 {
-    qDebug() << ">>>>>>>>>" << booksVector[rowCount - 1].name;
-
+    tableWidget->setSortingEnabled(false);
     for (int i = 0; i < rowCount; ++ i)
     {
         QTableWidgetItem *name = new QTableWidgetItem;
@@ -164,6 +260,7 @@ void MainWindow::setValues()
         link->setText(booksVector[i].link);
         tableWidget->setItem(i, 5, link);
     }
+    tableWidget->setSortingEnabled(true);
 }
 
 void MainWindow::updateSingleValue(QTableWidgetItem* item)
@@ -211,9 +308,14 @@ void MainWindow::updateSingleValue(QTableWidgetItem* item)
      save->setEnabled(false);
      BookMapper mapper;
      QJsonDocument doc(mapper.doJson(booksVector));
-     QString filePath = path + "/" + dirName + "/" + fileName;
 
-     FileHelper::upload(filePath, QString(doc.toJson()));
+
+     if (FileHelper::upload(fileName, QString(doc.toJson())))
+         statusBar()->showMessage("Saved");
+     else {
+         statusBar()->showMessage("Not saved!");
+     }
+
 }
 
 void MainWindow::updateEntries()
@@ -223,5 +325,27 @@ void MainWindow::updateEntries()
     tableWidget->insertRow(rowCount - 1);
     setValues();
     saveSlot();
+}
+
+void MainWindow::openSlot()
+{
+    this->fileName = QFileDialog::getOpenFileName(nullptr, tr("Open file"), "/", tr("Json (*.json)"));
+
+    tableWidget->clearContents();
+    tableWidget->setRowCount(0);
+
+    if (booksVector.size() > 0)
+    {
+        booksVector.clear();
+        booksVector = getBooks(fileName);
+    } else
+    {
+        booksVector = getBooks(fileName);
+    }
+
+    rowCount = booksVector.size();
+    tableWidget->setRowCount(rowCount);
+
+    setValues();
 }
 

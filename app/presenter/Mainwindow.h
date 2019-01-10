@@ -8,31 +8,35 @@
 #include <QVector>
 #include <QMenu>
 #include <QMenuBar>
+#include <QtAlgorithms>
 #include <QJsonDocument>
+#include <QStatusBar>
+#include <algorithm>
+#include <QItemSelectionModel>
+#include <QInputDialog>
+#include <QAbstractItemModel>
 #include "app/models/BookModel.h"
 #include "app/utils/FileHelper.h"
 #include "app/mapper/BookMapper.h"
 #include "app/presenter/AddBookWndow.h"
-
+#include "app/presenter/FindWindow.h"
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit MainWindow(const QString& path, QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    QVector<BookModel> getBooks();
+    QVector<BookModel> getBooks(const QString& filePath);
 
 private:
-    QString path;
-
     QMenu* addBook;
     QMenu* removeBook;
     QMenu* exportBook;
     QMenu* help;
 
-    QTableWidget* tableWidget;
     QWidget* wdg;
+    QTableWidget* tableWidget;
     QHBoxLayout* layout;
     QVBoxLayout* actionLayout;
     QVBoxLayout* tableLayout;
@@ -45,9 +49,8 @@ private:
     QPushButton* save;
 
     QString fileName;
-    QString dirName;
 
-
+    FindWindow* findWnd;
     AddBookWindow* addWnd;
 
     int rowCount;
@@ -62,16 +65,19 @@ private slots:
     void removeBookSlot();
     void exportBooksSlot();
     void findBookSlot();
-    void sortBookSlot();
+    void findBookEntry(const QString name);
+    void sortBookByYearSlot();
+    void sortBookByNameSlot();
     void aboutSlot();
     void updateSingleValue(QTableWidgetItem* item);
     void saveSlot();
+    void exitSlot();
+    void openSlot();
 
 signals:
 
 public slots:
     void updateEntries();
-
 };
 
 #endif // MAINWINDOW_H

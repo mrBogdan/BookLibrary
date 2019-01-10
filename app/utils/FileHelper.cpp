@@ -50,7 +50,7 @@ QString FileHelper::download(const QString& filePath)
     return json_string;
 }
 
-void FileHelper::upload(const QString& path, const QString& data)
+bool FileHelper::upload(const QString& path, const QString& data)
 {
     QFile file(path);
 
@@ -59,5 +59,8 @@ void FileHelper::upload(const QString& path, const QString& data)
         QTextStream stream(&file);
         stream << data << endl;
         file.close();
+        return true;
     }
+
+    return false;
 }

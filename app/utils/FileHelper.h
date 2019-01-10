@@ -16,8 +16,8 @@ public:
     FileHelper(QString dir);
     QFileInfoList getListDirs();
     QString getDir() const;
-    QString download(const QString& filePath);
-    void static upload(const QString& path, const QString& file);
+    static QString download(const QString& filePath);
+    bool static upload(const QString& path, const QString& file);
 };
 
 #endif

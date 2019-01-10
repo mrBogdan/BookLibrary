@@ -18,7 +18,6 @@ public:
     int     pageCount;
     QString link;
 
-
     const static QStringList names;
     void write(QJsonObject& json);
     void read(const QJsonObject& json);
