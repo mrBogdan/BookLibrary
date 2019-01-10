@@ -44,13 +44,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(findBtn, &QPushButton::clicked, this, &MainWindow::findBookSlot);
 }
 
-MainWindow::~MainWindow() {}
-
 void MainWindow::MainWindow::createMenus()
 {
     addBook = menuBar()->addMenu(tr("&File"));
     QAction* openFile = addBook->addAction(tr("&Open file"));
-    QAction* add = addBook->addAction(tr("&Add new book"));
+    QAction* add      = addBook->addAction(tr("&Add new book"));
     addBook->addSeparator();
     QAction* exitA = addBook->addAction(tr("&Exit"));
 
@@ -91,7 +89,6 @@ void MainWindow::removeBookSlot()
 {
     bool ok = false;
     QString name = QInputDialog::getText(this, tr("Remove by name"),
-                                         tr("Enter user name"), QLineEdit::Normal,
                                          QDir::home().dirName(), &ok);
     if (ok)
     {
@@ -109,7 +106,6 @@ void MainWindow::removeBookSlot()
             statusBar()->showMessage("Not found");
         }
     }
-
 }
 
 int MainWindow::findTableRow(const QString& name)

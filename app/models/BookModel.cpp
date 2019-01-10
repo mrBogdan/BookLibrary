@@ -30,18 +30,3 @@ void BookModel::read(const QJsonObject& json)
     pageCount = json.value("pageCount").toInt();
     link = json.value("link").toString();
 }
-
-
-void BookModel::print(QVector<BookModel> vec)
-{
-    for (auto v : vec)
-    {
-        qDebug() << "ID >>> " << v.id << endl;
-        qDebug() << "Name >>> " << v.name << endl;
-        qDebug() << "Author >>> " << v.author << endl;
-        qDebug() << "Year >>> " << v.year << endl;
-        qDebug() << "Descr >>> " << v.description << endl;
-        qDebug() << "Page c >>> " << v.pageCount << endl;
-        qDebug() << "link >>> " << v.link << endl;
-    }
-}

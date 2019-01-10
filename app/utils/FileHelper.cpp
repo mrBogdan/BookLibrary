@@ -1,13 +1,8 @@
 #include "app/utils/FileHelper.h"
 
-FileHelper::FileHelper(QString dir)
+QFileInfoList FileHelper::getListDirs(const QString& dirName)
 {
-    this->dir = dir;
-}
-
-QFileInfoList FileHelper::getListDirs()
-{
-    QDir dir(this->dir);
+    QDir dir(dirName);
     dir.setFilter(QDir::Files);
     dir.setSorting(QDir::Name);
 
@@ -16,17 +11,12 @@ QFileInfoList FileHelper::getListDirs()
     return list;
 }
 
-QString FileHelper::getDir() const
-{
-    return dir;
-}
-
 QString FileHelper::download(const QString& filePath)
 {
-    QString file_path = QDir::toNativeSeparators(filePath);
-    QFile file(file_path);
+    QString path = QDir::toNativeSeparators(filePath);
+    QFile file(path);
 
-    if(!QFile::exists(file_path))
+    if(!QFile::exists(path))
     {
         qDebug() << "File does not exists";
         if (file.open(QIODevice::WriteOnly)) {
@@ -38,16 +28,16 @@ QString FileHelper::download(const QString& filePath)
 
     if(!file.open(QIODevice::ReadOnly))
     {
-        qDebug() << "Failed to open " << file_path;
+        qDebug() << "Failed to open " << path;
         exit(1);
     }
 
-    QString json_string = "";
+    QString json = "";
 
-    json_string = file.readAll();
+    json = file.readAll();
     file.close();
 
-    return json_string;
+    return json;
 }
 
 bool FileHelper::upload(const QString& path, const QString& data)

@@ -19,12 +19,9 @@ public:
     QString link;
 
     const static QStringList names;
+
     void write(QJsonObject& json);
     void read(const QJsonObject& json);
-    void print(QVector<BookModel> vec);
 };
-
-
-
 
 #endif // BOOKMODEL_H

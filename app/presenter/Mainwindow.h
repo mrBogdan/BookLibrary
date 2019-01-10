@@ -1,20 +1,21 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QtWidgets>
 #include <QFile>
-#include <QTextStream>
-#include <QVector>
 #include <QMenu>
+#include <QVector>
+#include <algorithm>
 #include <QMenuBar>
+#include <QtWidgets>
+#include <QBoxLayout>
+#include <QStatusBar>
+#include <QMainWindow>
+#include <QTextStream>
+#include <QInputDialog>
 #include <QtAlgorithms>
 #include <QJsonDocument>
-#include <QStatusBar>
-#include <algorithm>
-#include <QItemSelectionModel>
-#include <QInputDialog>
 #include <QAbstractItemModel>
+#include <QItemSelectionModel>
 #include "app/models/BookModel.h"
 #include "app/utils/FileHelper.h"
 #include "app/mapper/BookMapper.h"
@@ -26,7 +27,6 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
     QVector<BookModel> getBooks(const QString& filePath);
 
 private:
@@ -35,11 +35,11 @@ private:
     QMenu* exportBook;
     QMenu* help;
 
-    QWidget* wdg;
+    QWidget*      wdg;
     QTableWidget* tableWidget;
-    QHBoxLayout* layout;
-    QVBoxLayout* actionLayout;
-    QVBoxLayout* tableLayout;
+    QHBoxLayout*  layout;
+    QVBoxLayout*  actionLayout;
+    QVBoxLayout*  tableLayout;
 
     QVector<BookModel> booksVector;
 
@@ -59,20 +59,22 @@ private:
     void createMenus();
     void setValues();
     void setTableWidget();
+    void updateBookValue(const int row, const int col, QTableWidgetItem* item);
+    int findTableRow(const QString& name);
 
 private slots:
-    void addBookSlot();
-    void removeBookSlot();
-    void exportBooksSlot();
-    void findBookSlot();
-    void findBookEntry(const QString name);
-    void sortBookByYearSlot();
-    void sortBookByNameSlot();
-    void aboutSlot();
-    void updateSingleValue(QTableWidgetItem* item);
     void saveSlot();
     void exitSlot();
     void openSlot();
+    void aboutSlot();
+    void addBookSlot();
+    void findBookSlot();
+    void findBookEntry(const QString& name);
+    void removeBookSlot();
+    void exportBooksSlot();
+    void updateSingleValue(QTableWidgetItem* item);
+    void sortBookByYearSlot();
+    void sortBookByNameSlot();
 
 signals:
 

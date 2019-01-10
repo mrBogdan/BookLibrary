@@ -1,23 +1,19 @@
 #ifndef FILE_HELPER_H
 #define FILE_HELPER_H
 
-#include <QFileInfoList>
-#include <QString>
 #include <QDir>
 #include <QFile>
 #include <QDebug>
+#include <QString>
 #include <QTextStream>
+#include <QFileInfoList>
 
 class FileHelper
 {
-private:
-    QString dir;
 public:
-    FileHelper(QString dir);
-    QFileInfoList getListDirs();
-    QString getDir() const;
-    static QString download(const QString& filePath);
-    bool static upload(const QString& path, const QString& file);
+    static QFileInfoList getListDirs(const QString& dirname);
+    static QString       download(const QString& filePath);
+    static bool          upload(const QString& path, const QString& file);
 };
 
 #endif

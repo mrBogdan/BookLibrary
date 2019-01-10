@@ -6,9 +6,9 @@ FindWindow::FindWindow(QWidget *parent)
     vLayout = new QVBoxLayout(this);
     hLayout = new QHBoxLayout;
 
-    nameLe = new QLineEdit;
+    nameLe    = new QLineEdit;
     labelName = new QLabel(tr("Enter the name you are looking for: "));
-    find = new QPushButton(tr("Find"));
+    find      = new QPushButton(tr("Find"));
 
     hLayout->addWidget(labelName);
     hLayout->addWidget(nameLe);
