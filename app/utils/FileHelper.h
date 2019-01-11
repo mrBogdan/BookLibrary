@@ -14,6 +14,8 @@ public:
     static QFileInfoList getListDirs(const QString& dirname);
     static QString       download(const QString& filePath);
     static bool          upload(const QString& path, const QString& file);
+
+    static QString initialData;
 };
 
 #endif

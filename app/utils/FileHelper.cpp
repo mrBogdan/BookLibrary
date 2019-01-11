@@ -1,5 +1,7 @@
 #include "app/utils/FileHelper.h"
 
+QString FileHelper::initialData = "{\"books\": [{}]}";
+
 QFileInfoList FileHelper::getListDirs(const QString& dirName)
 {
     QDir dir(dirName);
@@ -16,16 +18,6 @@ QString FileHelper::download(const QString& filePath)
     QString path = QDir::toNativeSeparators(filePath);
     QFile file(path);
 
-    if(!QFile::exists(path))
-    {
-        qDebug() << "File does not exists";
-        if (file.open(QIODevice::WriteOnly)) {
-            QTextStream stream(&file);
-            stream << "{\"books\": [{}]}" << endl;
-            file.close();
-        }
-    }
-
     if(!file.open(QIODevice::ReadOnly))
     {
         qDebug() << "Failed to open " << path;
@@ -35,6 +27,13 @@ QString FileHelper::download(const QString& filePath)
     QString json = "";
 
     json = file.readAll();
+
+    if (json.isEmpty())
+    {
+        FileHelper::upload(path, FileHelper::initialData);
+        json = FileHelper::download(path);
+    }
+
     file.close();
 
     return json;
